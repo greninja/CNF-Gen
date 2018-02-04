@@ -71,3 +71,12 @@ get_models(F, 10)
 #  [z = True, y = False, x = True],
 #  [z = True, y = True, x = False]]
 
+# 4.2.18 - Getting values of variables of a BoolVector
+vec = BoolVector('n', 10)
+G = [Or(vec)]
+models = get_models(G, 22) # since it returns exactly 22 models
+for solution in models:
+    length = len(solution)
+    for j in range(length):
+        print solution[solution[j]]
+    print "\n"
