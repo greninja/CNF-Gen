@@ -1,10 +1,18 @@
 import numpy as np 
 from z3 import *
 
-#Creating synthesized data
-inputs, outputs = [np.random.randint(0,2,6) for _ in xrange(5)], [np.random.randint(0,2,6) for _ in xrange(5)]
-indices = [i for i, x in enumerate(outputs) if x==1]
+#Creating synthesized dataset
+inputs, outputs = [np.random.randint(0,2,6) for _ in xrange(5)], [np.random.randint(0,2,1) for _ in xrange(5)]
+trueoutputs, falseoutputs = [i for i, x in enumerate(outputs) if x==1], \
+                                                    [i for i, x in enumerate(outputs) if x==0]
+on_indices = map(lambda index : np.where(inputs[index] == 1)[0], xrange(len(inputs)))
+off_indices = map(lambda index : np.where(inputs[index] == 0)[0], xrange(len(inputs)))
 
+pmatrix = []
+for index in trueoutputs:
+    pi = BoolVector('pi', len(on_indices[index]))
+    pmatrix.append(pi)
+     
 # Sample example
 x1, x2, x3 = Bools('x1 x2 x3')
 g = Goal()
@@ -32,7 +40,7 @@ m = s.model()
 
 
 # TODO 3rd Feb, 18
-1) See how to store output of solve() - Done : storing output of 'get_models' in an arrays
+1) See how to store output of solve() - Done : storing output of 'get_models' in an array variable 
 2) Write a summary of other approaches
 3) Write the boolean formula for all the minterms instead of just one
 
@@ -41,7 +49,7 @@ m = s.model()
 
 
 from z3 import *
-x, y, z = Bools('x y z')
+x, y, z = Bools('x y z') 
 # Return the first "M" models of formula list of formulas F 
 def get_models(F, M):
     result = []
