@@ -10,9 +10,20 @@ off_indices = map(lambda index : np.where(inputs[index] == 0)[0], xrange(len(inp
 
 pmatrix = []
 for index in trueoutputs:
-    pi = BoolVector('pi', len(on_indices[index]))
-    pmatrix.append(pi)
-     
+    parr = []
+    for elem in on_indices[index]:
+        pi = Bool('p'+str(elem))
+        parr.append(pi)
+    pmatrix.append(parr)
+
+ndashmatrix = []
+for index in trueoutputs:
+    ndasharr = []
+    for elem in on_indices[index]:
+        ni = Bool('n`'+str(elem))
+        ndasharr.append(ni)
+    ndashmatrix.append(ndasharr)
+
 # Sample example
 x1, x2, x3 = Bools('x1 x2 x3')
 g = Goal()
@@ -70,7 +81,7 @@ def get_models(F, M):
                 raise Z3Exception("arrays and uninterpreted sorts are not supported")
             block.append(c != m[d])
         s.add(Or(block))
-    return result
+    return result   
 F = [And(Or(x, y), Or(y, z))]
 get_models(F, 10)
 # Returns the following:
