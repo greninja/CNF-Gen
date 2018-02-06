@@ -1,4 +1,4 @@
-Steps I followed but didn't go:
+Steps I followed but didn't work:
 
 	sudo apt-get update
 	sudo apt-get install python-z3
