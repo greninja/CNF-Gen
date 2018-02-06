@@ -8,21 +8,34 @@ trueoutputs, falseoutputs = [i for i, x in enumerate(outputs) if x==1], \
 on_indices = map(lambda index : np.where(inputs[index] == 1)[0], xrange(len(inputs)))
 off_indices = map(lambda index : np.where(inputs[index] == 0)[0], xrange(len(inputs)))
 
-pmatrix = []
-for index in trueoutputs:
-    parr = []
-    for elem in on_indices[index]:
-        pi = Bool('p'+str(elem))
-        parr.append(pi)
-    pmatrix.append(parr)
+P_ON_MATRIX = []
+for clause in range(1,3): 
+    temp = []
+    for index in trueoutputs:
+        parr = []
+        for elem in on_indices[index]:
+            pi = Bool('p'+str(elem)+str(clause))
+            parr.append(pi)
+        temp.append(parr)
+    P_ON_MATRIX.append(temp)
 
-ndashmatrix = []
-for index in trueoutputs:
-    ndasharr = []
-    for elem in on_indices[index]:
-        ni = Bool('n`'+str(elem))
-        ndasharr.append(ni)
-    ndashmatrix.append(ndasharr)
+N_OFF_MATRIX = []
+for clause in range(1,3): 
+    temp = []
+    for index in trueoutputs:
+        narr = []
+        for elem in off_indices[index]:
+            ni = Bool('n'+str(elem)+str(clause))
+            narr.append(ni)
+        temp.append(narr)
+    N_OFF_MATRIX.append(temp)  
+
+#Generating all-SAT only for '1' minterms:
+matrix = [] # Would contain all the clauses generated from minterms which are 1
+for i in xrange(len(P_ON_MATRIX)):
+    for j in xrange(len(P_ON_MATRIX[0])):
+        matrix.append(Or(pmatrix[i][j] + nmatrix[i][j]))
+models = get_models(matrix)
 
 # All-SAT procedure in Z3Py
 x, y, z = Bools('x y z') 
