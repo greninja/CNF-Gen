@@ -36,3 +36,9 @@ for index in trueoutputs:
         parr.append(pi)
     pmatrix.append(parr)
  
+
+Things todo:
+1) Multiprocessing option
+2) Atmost 2 variables should be true at a time
+3) Retrieving the values of the variables and constructing the function
+4) For terms where function evaluates to 0, think how to construct clauses
