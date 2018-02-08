@@ -19,14 +19,7 @@ x, y = Bools('x y')
 s = Solver()
 s.add(Or(x, y))
 m = s.model()
-# 'm'  contains the satisfying assignments of variables. 
-
-
-# TODO LIST:
-1) Summary of other approaches
-2) Removing 'M' from All-SAT procedure code until it is unsat
-3) Generating clauses for every minterm - Generating clause for each minterm
-
+# 'm'  contains the satisfying assignments of variables.
 
 pmatrix = []
 for index in trueoutputs:
@@ -35,10 +28,3 @@ for index in trueoutputs:
         pi = Bool('p'+str(elem))
         parr.append(pi)
     pmatrix.append(parr)
- 
-
-Things todo:
-1) Multiprocessing option
-2) Atmost 2 variables should be true at a time
-3) Retrieving the values of the variables and constructing the function
-4) For terms where function evaluates to 0, think how to construct clauses
