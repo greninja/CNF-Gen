@@ -62,6 +62,17 @@ for index in falseoutputs:
             clause_array.append(pi)
         clauses.append(Or(clause_array))
 
+# Additional clauses for restricting 2 polarities of the same variable to be not present 
+# in the same clause
+parray, narray = [], []
+for i in xrange(len(inputs)+1):
+    for j in xrange(1, 3):
+        pi, ni = Not(Bool('p'+str(i)+str(j))), Not(Bool('n'+str(i)+str(j)))
+        parray.append(pi); narray.append(ni)
+zipped = zip(parray, narray)
+for c in zipped:
+    clauses.append(Or(c))
+
 #Generating all the satisfying assignments
 start_time = time.time()    
 models = get_models(clauses)
@@ -175,4 +186,21 @@ def get_models(F):
             block.append(c != m[d])
         s.add(Or(block))
     return result
+"""
+
+"""
+Sample output:
+
+shadab@hp:~/python/workrepo/src$ ls
+extra_code.py  primary.py
+shadab@hp:~/python/workrepo/src$ python primary.py 
+Time taken to generate the models : 103.262834072 
+ ,         Number of models generated : 81
+['Not(x5) or Not(x2) AND Not(x2) or x3',
+ 'Not(x5) or Not(x2) AND Not(x5) or x1',
+ 'Not(x2) or x3 AND x4 or x3',
+ 'Not(x2) or Not(x1) AND x4 or x3',
+ 'Not(x5) or Not(x2) AND x4 or x3']
+shadab@hp:~/python/workrepo/src$ 
+
 """
