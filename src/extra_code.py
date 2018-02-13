@@ -28,3 +28,25 @@ for index in trueoutputs:
         pi = Bool('p'+str(elem))
         parr.append(pi)
     pmatrix.append(parr)
+
+# For variables that are not present in the satisfying models implying they could take either of the values,
+# do not consider them in final solution because their values wont really matter
+
+"""
+multiprocessing code
+
+from multiprocessing import Process
+p = Process(target=get_models, args=[clauses])
+p.start()
+"""
+
+for index in falseoutputs:
+    for clause in xrange(1, 3):
+        clause_array = []
+        for elem in on_indices[index]:
+            ni = Bool('n'+str(elem)+str(clause))
+            clause_array.append(ni)
+        for elem in off_indices[index]:
+            pi = Bool('p'+str(elem)+str(clause))
+            clause_array.append(pi)
+        clauses.append(Or(clause_array))

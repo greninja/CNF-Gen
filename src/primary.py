@@ -40,6 +40,8 @@ def get_models(F):
     return result
 
 # Generating the clauses
+# Constraint type 1:
+# For functions evaluating to 1
 clauses = []
 for index in trueoutputs:   
     for clause in xrange(1,3):
@@ -52,18 +54,27 @@ for index in trueoutputs:
             clause_array.append(ni)
         clauses.append(Or(clause_array))
 
-for index in falseoutputs:
-    for clause in xrange(1, 3):
-        clause_array = []
-        for elem in on_indices[index]:
-            ni = Bool('n'+str(elem)+str(clause))
-            clause_array.append(ni)
-        for elem in off_indices[index]:
-            pi = Bool('p'+str(elem)+str(clause))
-            clause_array.append(pi)
-        clauses.append(Or(clause_array))
+# Constraint type 2:
+# Either of the CNF can be zero for the overall value to evaluate to zero
+z1, z2 = Bools('z1 z2')
+d = dict()
+for clause_indice in xrange(1, 3):
+    d['z'+str(clause_indice)] = Bool('z'+str(clause_indice))
+clauses.append(Or(Not(z1), Not(z2))) 
 
-# Additional clauses for restricting 2 polarities of the same variable to be not present 
+for index in falseoutputs:
+    for clause in xrange(1,3):
+        arr1, arr2 = [], []
+        for elem in on_indices[index]:
+            pi, ni = Bool('p'+str(elem)+str(clause)), Bool('n'+str(elem)+str(clause))
+            arr1.append(ni); arr2.append(pi)
+        for elem in off_indices[index]:
+            pi, ni = Bool('p'+str(elem)+str(clause)), Bool('n'+str(elem)+str(clause))
+            arr1.append(pi); arr2.append(ni)
+        clauses.append(Or(And(Not(d['z'+str(clause)]), Or(arr1)), And(d['z'+str(clause)], Or(arr2))))
+
+# Constraint type 3:
+# Additional constraints for restricting 2 polarities of the same variable to be not present 
 # in the same clause
 parray, narray = [], []
 for i in xrange(len(inputs)+1):
@@ -74,31 +85,33 @@ zipped = zip(parray, narray)
 for c in zipped:
     clauses.append(Or(c))
 
+# Constraint type 4:
 # Following piece of code creates:
 # (1) additional constraints so that each clause in the function has atmost 2 'True' assignments
 # (2) a dictionary for mapping encoding variables to function variables
-dictionary = {}
+dictionary = dict()
 for clause_indice in xrange(1, 3):
-    array = []
+    clause_array = []
     for var_indice in xrange(6):
         pi, ni = 'p'+str(var_indice)+str(clause_indice), 'n'+str(var_indice)+str(clause_indice)
         dictionary[pi], dictionary[ni] = 'x'+str(var_indice), 'Not(x'+str(var_indice)+')'
-        array.append(Bool(pi)); array.append(Bool(ni))
-    clauses.append(Sum([If(x, 1, 0) for x in array]) <= 2)
+        clause_array.append(Bool(pi)); clause_array.append(Bool(ni))
+    clauses.append(Sum([If(x, 1, 0) for x in clause_array]) <= 2)
 
 #Generating all the satisfying assignments
 start_time = time.time()    
 models = get_models(clauses)
 end_time = time.time()
-print "Time taken to generate the models : {} \n , \
+print "Time taken to generate the models : {} \n  \
         Number of models generated : {}".format((end_time - start_time), len(models))
 
-# Constructing the possible functions (as of now : just 5 functions)
-samples = models[:5]
-functions = []
+# Constructing the possible functions (as of now : just 5 random functions)
+samples, functions = [], []
+for rand in np.random.choice(len(models), 5, replace=False):
+    samples.append(models[rand])
 for sample in samples:
     c1, c2 = [], []
-    for d in sample:
+    for e in sample:
         if sample[d] == True:
             if str(d).endswith('1'):
                 c1.append(dictionary[str(d)])
@@ -121,14 +134,3 @@ for sample in samples:
     functions.append(string)
 
 pprint.pprint(functions)
-
-# For variables that are not present in the satisfying models implying they could take either of the values,
-# do not consider them in final solution because their values wont really matter
-
-"""
-multiprocessing code
-
-from multiprocessing import Process
-p = Process(target=get_models, args=[clauses])
-p.start()
-"""
