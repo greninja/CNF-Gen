@@ -50,3 +50,11 @@ for index in falseoutputs:
             pi = Bool('p'+str(elem)+str(clause))
             clause_array.append(pi)
         clauses.append(Or(clause_array))
+#to create input file
+with open("input.txt","w+") as f:                                                 
+    for _ in xrange(5):
+       for _ in xrange(10):
+           f.write(str(np.random.randint(0,2)))
+       f.write(" ")
+       f.write(str(np.random.randint(0,2)))
+       f.write("\n")  
