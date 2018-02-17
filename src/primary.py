@@ -3,7 +3,7 @@ from z3 import *
 from datetime import datetime
 import pprint
 
-#Synthesizing the dataset
+# Synthesizing the dataset
 inputs, outputs = [], []
 with open("input.txt", "r") as f:
     data = f.readlines() 
@@ -16,8 +16,10 @@ for s in data:
     outputs.append(int(e[1])) 
 trueoutputs = [i for i, x in enumerate(outputs) if x==1]                                                    
 falseoutputs = [i for i, x in enumerate(outputs) if x==0]
-on_indices = map(lambda index : np.where(np.array(inputs[index]) == 1)[0], xrange(len(inputs)))
-off_indices = map(lambda index : np.where(np.array(inputs[index]) == 0)[0], xrange(len(inputs)))
+on_indices = map(lambda index : np.where(np.array(inputs[index]) == 1)[0], \
+                                                             xrange(len(inputs)))
+off_indices = map(lambda index : np.where(np.array(inputs[index]) == 0)[0], \
+                                                             xrange(len(inputs)))
 
 def get_models(F):
     """
@@ -47,9 +49,8 @@ def get_models(F):
         s.add(Or(block))
     return result
 
-# Generating the clauses
-# Constraint type 1:
-# For functions evaluating to 1
+# Generating the constraint clauses
+# Constraint 1:
 clauses = []
 for index in trueoutputs:   
     for clause in xrange(1,3):
@@ -62,7 +63,7 @@ for index in trueoutputs:
             clause_array.append(ni)
         clauses.append(Or(clause_array))
 
-# Constraint type 2:
+# Constraint 2:
 # Either of the CNF can be zero for the overall value to evaluate to zero
 z1, z2 = Bools('z1 z2')
 d = dict()
@@ -70,6 +71,7 @@ for clause_indice in xrange(1, 3):
     d['z'+str(clause_indice)] = Bool('z'+str(clause_indice))
 clauses.append(Or(Not(z1), Not(z2))) 
 
+# Constraint 3:
 for index in falseoutputs:
     for clause in xrange(1,3):
         arr1, arr2 = [], []
@@ -78,12 +80,14 @@ for index in falseoutputs:
             arr1.append(ni); arr2.append(pi)
         for elem in off_indices[index]:
             pi, ni = Bool('p'+str(elem)+str(clause)), Bool('n'+str(elem)+str(clause))
-            arr1.append(pi); arr2.append(ni)
-        clauses.append(Or(And(Not(d['z'+str(clause)]), Or(arr1)), And(d['z'+str(clause)], Or(arr2))))
+            arr1.append(pi)
+            arr2.append(ni)
+        clauses.append(Or(And(Not(d['z'+str(clause)]), \
+                                Or(arr1)), And(d['z'+str(clause)], Or(arr2))))
 
-# Constraint type 3:
-# Additional constraints for restricting 2 polarities of the same variable to be not present 
-# in the same clause
+# Constraint 4:
+# Additional constraints for restricting 2 polarities of the same variable  
+# to be not present in the same clause
 parray, narray = [], []
 for i in xrange(len(inputs)+1):
     for j in xrange(1, 3):
@@ -93,20 +97,24 @@ zipped = zip(parray, narray)
 for c in zipped:
     clauses.append(Or(c))
 
-# Constraint type 4:
+# Constraint 5:
 # Following piece of code creates:
-# (1) additional constraints so that each clause in the function has atmost 2 'True' assignments
+# (1) additional constraints so that each clause in the function has atmost
+#     two 'True' assignments
 # (2) a dictionary for mapping encoding variables to function variables
 dictionary = dict()
 for clause_indice in xrange(1, 3):
     clause_array = []
     for var_indice in xrange(6):
-        pi, ni = 'p'+str(var_indice)+str(clause_indice), 'n'+str(var_indice)+str(clause_indice)
-        dictionary[pi], dictionary[ni] = 'x'+str(var_indice), 'Not(x'+str(var_indice)+')'
-        clause_array.append(Bool(pi)); clause_array.append(Bool(ni))
+        pi, ni = 'p'+str(var_indice)+str(clause_indice), \
+                                    'n'+str(var_indice)+str(clause_indice)
+        dictionary[pi], dictionary[ni] = 'x'+str(var_indice), \
+                                                'Not(x'+str(var_indice)+')'
+        clause_array.append(Bool(pi)) 
+        clause_array.append(Bool(ni))
     clauses.append(Sum([If(x, 1, 0) for x in clause_array]) <= 2)
 
-#Generating all the satisfying assignments
+# Generating all the satisfying assignments to the constraint clauses
 start_time = datetime.now()   
 models = get_models(clauses)
 end_time = datetime.now()
