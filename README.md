@@ -1,5 +1,6 @@
 # Overview of this repo:
 
+
 Hello, here I am generating 2-CNF boolean functions by encoding the search for them as a SAT problem. I am currently using Z3Py (Python Interface for Z3 Solver) for generating satisfying assingments.
 
 
