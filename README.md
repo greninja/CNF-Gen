@@ -1,6 +1,6 @@
 # Overview of this repo:
 
-Hello, here I am trying to generate boolean functions by encoding the search for them as a SAT problem. I am currently using a synthesized ON-SET and OFF-SET dataset and Z3Py for generating satisfying assingments to the variables.
+Hello, here I am generating 2-CNF boolean functions by encoding the search for them as a SAT problem. I am currently using Z3Py (Python Interface for Z3 Solver) for generating satisfying assingments.
 
 
 ## Quick Installation steps for Z3Py:
