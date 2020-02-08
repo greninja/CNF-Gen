@@ -17,17 +17,17 @@ for s in data:
     outputs.append(int(e[1])) 
 trueoutputs = [i for i, x in enumerate(outputs) if x==1]                                                    
 falseoutputs = [i for i, x in enumerate(outputs) if x==0]
-on_indices = map(lambda index : np.where(np.array(inputs[index]) == 1)[0], \
-                                                             xrange(len(inputs)))
-off_indices = map(lambda index : np.where(np.array(inputs[index]) == 0)[0], \
-                                                             xrange(len(inputs)))
+on_indices = list(map(lambda index : np.where(np.array(inputs[index]) == 1)[0], \
+                                                             range(len(inputs))))
+off_indices = list(map(lambda index : np.where(np.array(inputs[index]) == 0)[0], \
+                                                             range(len(inputs))))
 
 s=Solver()
 
 # Generating the constraint clauses
 # Constraint 1:
 for index in trueoutputs:   
-    for clause in xrange(1,3):
+    for clause in range(1,3):
         clause_array = []
         for elem in on_indices[index]:
             pi = Bool('p'+str(elem)+str(clause))
@@ -41,7 +41,7 @@ for index in trueoutputs:
 d = dict()
 for index in falseoutputs:
     arr = []
-    for clause_indice in xrange(1, 3):
+    for clause_indice in range(1, 3):
         z = 'z'+str(index)+str(clause_indice)
         d[z] = Bool(z)
         arr.append(Not(d[z])) 
@@ -49,7 +49,7 @@ for index in falseoutputs:
 
 # Constraint 3:
 for index in falseoutputs:
-    for clause in xrange(1, 3):   
+    for clause in range(1, 3):   
         arr = []          
         for elem in on_indices[index]:                                     
             pi = Bool('p'+str(elem)+str(clause))          
@@ -63,8 +63,8 @@ for index in falseoutputs:
 # Additional constraints for restricting 2 polarities of the same variable  
 # to be not present in the same clause
 parray, narray = [], []
-for i in xrange(len(inputs[0])):
-    for j in xrange(1, 3):
+for i in range(len(inputs[0])):
+    for j in range(1, 3):
         pi, ni = Not(Bool('p'+str(i)+str(j))), Not(Bool('n'+str(i)+str(j)))
         parray.append(pi); narray.append(ni)
 zipped = zip(parray, narray)
@@ -77,9 +77,9 @@ for c in zipped:
 #     two 'True' assignments
 # (2) a dictionary for mapping encoding variables to function variables
 dictionary = dict()
-for clause_indice in xrange(1, 3):
+for clause_indice in range(1, 3):
     clause_array = []
-    for var_indice in xrange(len(inputs[0])):
+    for var_indice in range(len(inputs[0])):
         pi, ni = 'p'+str(var_indice)+str(clause_indice), \
                                     'n'+str(var_indice)+str(clause_indice)
         dictionary[pi], dictionary[ni] = 'x'+str(var_indice), \
